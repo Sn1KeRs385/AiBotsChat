@@ -2,7 +2,8 @@
 
 
 return [
-    'bot_api_key' => env('TELEGRAM_BOT_API_KEY'),
-    'public_id' => env('TELEGRAM_PUBLIC_ID'),
+    'bot_api_keys' => [
+        'chat_gpt' => env('TELEGRAM_CHATGPT_BOT_API_KEY')
+    ],
     'webhook_token' => env('TELEGRAM_WEBHOOK_TOKEN'),
 ];
