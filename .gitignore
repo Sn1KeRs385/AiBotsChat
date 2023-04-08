@@ -1,0 +1,6 @@
+/.idea/
+/docker/config/nginx/log/
+/docker-compose.yml
+/.docker/
+/.env
+/www/site/.env
