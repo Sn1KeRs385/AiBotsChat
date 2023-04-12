@@ -13,6 +13,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property-read int $id
  * @property string $password
  * @property string $remember_token
+ * @property int $gpt_message_balance
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
