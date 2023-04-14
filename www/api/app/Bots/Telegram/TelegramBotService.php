@@ -11,27 +11,33 @@ use SergiX44\Nutgram\Telegram\Attributes\ParseMode;
 
 class TelegramBotService
 {
-
     public function notify(
         BotType $botType,
-        NotificationInfo $notificationInfo,
+        string $chatId,
+        string $content,
+    ): void {
+        $bot = new TelegramBot(config("telegram.bot_api_keys.{$botType->getConfigEquivalent()}"));
+
+        $bot->sendMessage($content, ['chat_id' => $chatId, 'parse_mode' => ParseMode::HTML]);
+    }
+
+    public function notifyToExistsMessage(
+        BotType $botType,
+        string $chatId,
+        int $messageId,
         string $content,
         bool $force = false
     ): void {
-        if (!$notificationInfo->chatId || !$notificationInfo->messageId) {
-            return;
-        }
-
         $bot = new TelegramBot(config("telegram.bot_api_keys.{$botType->getConfigEquivalent()}"));
 
-        $blockKey = "TelegramBlock:Chat:{$notificationInfo->chatId}:Message:{$notificationInfo->messageId}";
+        $blockKey = "TelegramBlock:Chat:{$chatId}:Message:{$messageId}";
 
         if ($force || !Cache::has($blockKey)) {
             $this->tryEditMessage(
                 $bot,
                 $content,
-                $notificationInfo->chatId,
-                $notificationInfo->messageId
+                $chatId,
+                $messageId
             );
             Cache::add($blockKey, true, Carbon::now()->addSeconds(1));
         }

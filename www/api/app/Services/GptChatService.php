@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Enums\GptRole;
+use App\Enums\WalletType;
 use App\Exceptions\Models\GptChat\MessageCannotBeEmpty;
+use App\Exceptions\Models\Wallet\NotEnoughFoundsException;
 use App\Jobs\GetAnswerFromGptApi;
 use App\Models\Casts\NotificationInfo;
 use App\Models\GptChat;
@@ -29,6 +31,11 @@ class GptChatService
 
         if ($sendAsStream === null) {
             $sendAsStream = config('integrations.open_ai.stream_enabled');
+        }
+
+        $wallet = $user->getOrCreateWalletByType(WalletType::GPT);
+        if ($wallet->balance === 0) {
+            throw new NotEnoughFoundsException();
         }
 
         $chat = $this->gptChatRepository->getActualChatForUser($user);

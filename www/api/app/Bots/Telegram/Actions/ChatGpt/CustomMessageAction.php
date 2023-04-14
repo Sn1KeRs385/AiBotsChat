@@ -7,7 +7,9 @@ use App\Bots\Telegram\Actions\Traits\ActionRouteInfoMapper;
 use App\Bots\Telegram\Facades\TelegramWebhook;
 use App\Enums\GptRole;
 use App\Enums\MessengerType;
+use App\Enums\WalletType;
 use App\Exceptions\Models\GptChat\MessageCannotBeEmpty;
+use App\Exceptions\Models\Wallet\NotEnoughFoundsException;
 use App\Models\Casts\NotificationInfo;
 use App\Services\GptChatService;
 use SergiX44\Nutgram\Telegram\Attributes\ChatActions;
@@ -65,13 +67,19 @@ class CustomMessageAction extends AbstractAction
             );
         } catch (\Throwable $exception) {
             $text = 'Произошла неизвестная ошибка, попробуйте повторить попытку позже.';
+
             if ($exception instanceof MessageCannotBeEmpty) {
                 $text = $exception->getMessage();
+            } elseif ($exception instanceof NotEnoughFoundsException) {
+                $wallet = TelegramWebhook::getUser()->getWalletByType(WalletType::GPT);
+                $text = "У вас недостаточно токенов. На вашем счету -{$wallet->debt} токенов";
             }
+
             TelegramWebhook::getBot()->editMessageText($text, [
                 'chat_id' => $messageForResult->chat->id,
                 'message_id' => $messageForResult->message_id,
             ]);
+            
             throw $exception;
         }
     }

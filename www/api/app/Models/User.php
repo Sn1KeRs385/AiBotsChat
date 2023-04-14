@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Traits\EntityPhpDoc;
+use App\Models\Traits\HasWallets;
 use App\Models\Traits\Relations\UserRelations;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -23,6 +24,7 @@ class User extends Authenticatable
     use HasApiTokens;
     use Notifiable;
     use UserRelations;
+    use HasWallets;
 
     /**
      * The attributes that are mass assignable.

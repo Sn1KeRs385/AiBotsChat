@@ -5,12 +5,19 @@ namespace App\Bots\Telegram\Actions\ChatGpt;
 use App\Bots\Telegram\Actions\AbstractAction;
 use App\Bots\Telegram\Actions\Traits\ActionRouteInfoMapper;
 use App\Bots\Telegram\Facades\TelegramWebhook;
+use App\Bots\Telegram\Keyboards\ChatGptKeyboards;
 use SergiX44\Nutgram\Telegram\Attributes\ParseMode;
 use SergiX44\Nutgram\Telegram\Attributes\UpdateTypes;
+use SergiX44\Nutgram\Telegram\Types\Keyboard\KeyboardButton;
+use SergiX44\Nutgram\Telegram\Types\Keyboard\ReplyKeyboardMarkup;
 
 class StartAction extends AbstractAction
 {
     use ActionRouteInfoMapper;
+
+    public function __construct(protected ChatGptKeyboards $keyboards)
+    {
+    }
 
     public function __invoke(): void
     {
@@ -36,13 +43,17 @@ class StartAction extends AbstractAction
             [
                 'chat_id' => TelegramWebhook::getData()->getChat()->id,
                 'parse_mode' => ParseMode::HTML,
+                'reply_markup' => $this->keyboards->getMainReplyKeyboard(),
             ]
         );
     }
 
     public static function getPaths(): array
     {
-        return ['/^\/start/u'];
+        return [
+            '/^\/start/u',
+            '/^.{0,3}Возможности/u'
+        ];
     }
 
     public static function getAvailableWebhookTypes(): array
