@@ -29,7 +29,8 @@ class TelegramSetWebhook extends Command
         $this->setBotWebhook(config('telegram.bot_api_keys.chat_gpt'), route('api.telegram.webhook.chat-gpt'));
     }
 
-    protected function setBotWebhook(string $apiKey, string $url): void {
+    protected function setBotWebhook(string $apiKey, string $url): void
+    {
         $bot = new TelegramBot($apiKey);
         $bot->setWebhook(
             $url,
@@ -40,6 +41,7 @@ class TelegramSetWebhook extends Command
                     'callback_query',
                     'chat_join_request',
                     'chat_member',
+                    'pre_checkout_query',
                 ],
                 'drop_pending_updates' => filter_var(
                     $this->option('dropUpdates') ?? false,

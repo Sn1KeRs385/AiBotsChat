@@ -104,7 +104,10 @@ class GptChatMessageObserver
             ]
         );
 
-        $content = "<b>Списано <code>{$amount}</code> токенов. Остаток: <code>{$wallet->getBalanceNormalize()}</code></b>";
+        $amountFormatted = number_format($amount, 0, '.', ' ');
+        $balance = number_format($wallet->getBalanceNormalize(), 0, '.', ' ');
+
+        $content = "<b>Списано <code>{$amountFormatted}</code> токенов. Остаток: <code>{$balance}</code></b>";
         switch ($gptChatMessage->notification_info->type) {
             case MessengerType::TELEGRAM:
                 $this->telegramBotService->notify(

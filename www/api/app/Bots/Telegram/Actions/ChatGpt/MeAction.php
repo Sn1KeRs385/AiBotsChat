@@ -24,6 +24,8 @@ class MeAction extends AbstractAction
             ->getOrCreateWalletByType(WalletType::GPT)
             ->getBalanceNormalize();
 
+        $balance = number_format($balance, 0, '.', ' ');
+
         $text = "*Баланс токенов:* `{$balance}`";
 
         TelegramWebhook::getBot()->sendMessage(

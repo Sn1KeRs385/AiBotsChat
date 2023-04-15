@@ -3,20 +3,15 @@
 namespace App\Bots\Telegram\ActionRouters;
 
 use App\Bots\Telegram\Actions\ActionContract;
+use App\Bots\Telegram\Attributes\UpdateTypes;
 use App\Bots\Telegram\Dto\ActionRouteInfo;
+use App\Bots\Telegram\Types\Common\Update;
 use Illuminate\Support\Collection;
-use SergiX44\Nutgram\Telegram\Attributes\UpdateTypes;
-use SergiX44\Nutgram\Telegram\Types\Common\Update;
 
 abstract class BaseActionRouter
 {
     /** @var Collection<int, ActionRouteInfo> */
     protected readonly Collection $routes;
-
-    protected function getCustomMessageAction(): ?ActionRouteInfo
-    {
-        return null;
-    }
 
     /**
      * @param  Update  $webhookData
@@ -35,6 +30,8 @@ abstract class BaseActionRouter
                 $webhookData->callback_query->data
             ),
             UpdateTypes::CHAT_MEMBER => $filteredRoutes,
+            UpdateTypes::PRE_CHECKOUT_QUERY => $filteredRoutes,
+            UpdateTypes::SUCCESSFUL_PAYMENT => $filteredRoutes,
             default => collect([]),
         })
             ->values()
@@ -63,7 +60,7 @@ abstract class BaseActionRouter
      */
     protected function getRoutesListFromText(Collection $routes, string $text): Collection
     {
-        $routes = $routes->filter(function (ActionRouteInfo $actionRouteInfo) use ($text) {
+        $routesFiltered = $routes->filter(function (ActionRouteInfo $actionRouteInfo) use ($text) {
             $pregTest = false;
             foreach ($actionRouteInfo->paths as $path) {
                 $pregTest = preg_match($path, $text) === 1;
@@ -75,13 +72,12 @@ abstract class BaseActionRouter
             return $pregTest;
         });
 
-        if ($routes->count() === 0) {
-            $customMessageAction = $this->getCustomMessageAction();
-            if ($customMessageAction) {
-                $routes->push($customMessageAction);
-            }
+        if ($routesFiltered->count() === 0) {
+            $routesFiltered = $routes->filter(function (ActionRouteInfo $actionRouteInfo) {
+                return count($actionRouteInfo->paths) === 0;
+            });
         }
 
-        return $routes;
+        return $routesFiltered;
     }
 }

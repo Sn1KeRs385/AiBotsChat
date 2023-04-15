@@ -17,12 +17,14 @@ class SetChatAction
      */
     public function handle(Request $request, Closure $next): Response
     {
-        TelegramWebhook::getBot()->sendChatAction(
-            ChatActions::TYPING,
-            [
-                'chat_id' => TelegramWebhook::getData()->getChat()->id
-            ]
-        );
+        if (isset(TelegramWebhook::getData()->getChat()->id)) {
+            TelegramWebhook::getBot()->sendChatAction(
+                ChatActions::TYPING,
+                [
+                    'chat_id' => TelegramWebhook::getData()->getChat()->id
+                ]
+            );
+        }
 
         return $next($request);
     }

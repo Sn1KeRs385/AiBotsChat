@@ -66,21 +66,20 @@ class CustomMessageAction extends AbstractAction
                 ),
             );
         } catch (\Throwable $exception) {
-            $text = 'Произошла неизвестная ошибка, попробуйте повторить попытку позже.';
+            $text = '<b>Произошла неизвестная ошибка, попробуйте повторить попытку позже.</b>';
 
             if ($exception instanceof MessageCannotBeEmpty) {
-                $text = $exception->getMessage();
+                $text = "<b>$exception->getMessage()</b>";
             } elseif ($exception instanceof NotEnoughFoundsException) {
                 $wallet = TelegramWebhook::getUser()->getWalletByType(WalletType::GPT);
-                $text = "У вас недостаточно токенов. На вашем счету -{$wallet->debt} токенов";
+                $text = "<b>У вас недостаточно токенов. На вашем счету <code>-{$wallet->debt}</code> токенов</b>";
             }
 
             TelegramWebhook::getBot()->editMessageText($text, [
                 'chat_id' => $messageForResult->chat->id,
                 'message_id' => $messageForResult->message_id,
+                'parse_mode' => ParseMode::HTML,
             ]);
-            
-            throw $exception;
         }
     }
 

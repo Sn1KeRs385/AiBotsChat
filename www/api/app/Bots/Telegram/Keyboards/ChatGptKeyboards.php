@@ -10,7 +10,7 @@ class ChatGptKeyboards
 {
     public function getMainReplyKeyboard(): ReplyKeyboardMarkup
     {
-        return ReplyKeyboardMarkup::make()
+        return ReplyKeyboardMarkup::make(resize_keyboard: true)
             ->addRow(
                 KeyboardButton::make('🔄 Сбросить диалог'),
                 KeyboardButton::make('💡 Возможности'),
