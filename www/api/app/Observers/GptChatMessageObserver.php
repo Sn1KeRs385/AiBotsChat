@@ -8,11 +8,14 @@ use App\Enums\MessengerType;
 use App\Enums\WalletTransactionType;
 use App\Enums\WalletType;
 use App\Models\GptChatMessage;
+use App\Utils\WordDeclension;
 
 class GptChatMessageObserver
 {
-    public function __construct(protected TelegramBotService $telegramBotService)
-    {
+    public function __construct(
+        protected TelegramBotService $telegramBotService,
+        protected WordDeclension $wordDeclension
+    ) {
     }
 
     public function created(GptChatMessage $gptChatMessage): void
@@ -107,7 +110,8 @@ class GptChatMessageObserver
         $amountFormatted = number_format($amount, 0, '.', ' ');
         $balance = number_format($wallet->getBalanceNormalize(), 0, '.', ' ');
 
-        $content = "<b>Списано <code>{$amountFormatted}</code> токенов. Остаток: <code>{$balance}</code></b>";
+        $tokenText = $this->wordDeclension->afterNumDeclension($amount, ['токен', 'токена', 'токенов'], false);
+        $content = "<b>Списано <code>{$amountFormatted}</code> {$tokenText}. Остаток: <code>{$balance}</code></b>";
         switch ($gptChatMessage->notification_info->type) {
             case MessengerType::TELEGRAM:
                 $this->telegramBotService->notify(

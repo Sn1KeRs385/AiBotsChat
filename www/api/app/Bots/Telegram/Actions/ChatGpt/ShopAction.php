@@ -19,6 +19,15 @@ class ShopAction extends AbstractAction
 
     public function __invoke(): void
     {
+        TelegramWebhook::getBot()->sendMessage(
+            'Магазин находится в разработке!',
+            [
+                'chat_id' => TelegramWebhook::getData()->getChat()->id,
+                'parse_mode' => ParseMode::HTML,
+            ]
+        );
+        return;
+
         $text = "Выберите количество токенов для покупки";
 
         $keyboard = Cache::tags([config('cache.config.tariff.tag')])
